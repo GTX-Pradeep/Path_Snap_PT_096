@@ -1,0 +1,48 @@
+{
+  "model": "logreg",
+  "family": "Linear / probabilistic",
+  "config": {
+    "C": "1.0",
+    "class_weight": "balanced",
+    "dual": "False",
+    "fit_intercept": "True",
+    "intercept_scaling": "1",
+    "l1_ratio": "0.0",
+    "max_iter": "1000",
+    "n_jobs": "None",
+    "penalty": "deprecated",
+    "random_state": "None",
+    "solver": "lbfgs",
+    "tol": "0.0001",
+    "verbose": "0",
+    "warm_start": "False"
+  },
+  "train_rows": 1383341,
+  "cv_macro_f1_folds": [
+    0.8156917598963086,
+    0.8151643145218372,
+    0.8393200661174631,
+    0.8443191733565221,
+    0.8158390037167352
+  ],
+  "cv_macro_f1_mean": 0.8260668635217734,
+  "cv_macro_f1_std": 0.01296079981693041,
+  "train_macro_f1": 0.8257256189052566,
+  "test_macro_f1": 0.8287317894179758,
+  "test_precision": 0.5827410836539089,
+  "test_recall": 0.9362560234653258,
+  "test_log_loss": 0.22773568940871963,
+  "test_top1_accuracy": 0.8478601252609603,
+  "test_confusion_matrix": [
+    [
+      108069,
+      12799
+    ],
+    [
+      1217,
+      17875
+    ]
+  ],
+  "train_time_s": 7.103754997253418,
+  "inference_time_s": 0.018950939178466797
+}
