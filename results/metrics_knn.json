@@ -1,0 +1,42 @@
+{
+  "model": "knn",
+  "family": "Instance-based",
+  "config": {
+    "algorithm": "auto",
+    "leaf_size": "30",
+    "metric": "minkowski",
+    "metric_params": "None",
+    "n_jobs": "-1",
+    "n_neighbors": "25",
+    "p": "2",
+    "weights": "distance"
+  },
+  "train_rows": 300000,
+  "cv_macro_f1_folds": [
+    0.8864519704892884,
+    0.8892587460179349,
+    0.9111174601058998,
+    0.9226765353540191,
+    0.8946774555922578
+  ],
+  "cv_macro_f1_mean": 0.9008364335118799,
+  "cv_macro_f1_std": 0.013867791384875256,
+  "train_macro_f1": 1.0,
+  "test_macro_f1": 0.9069163899762658,
+  "test_precision": 0.8523464532871973,
+  "test_recall": 0.8257385292269013,
+  "test_log_loss": 0.146993246995149,
+  "test_top1_accuracy": 0.8485386221294363,
+  "test_confusion_matrix": [
+    [
+      118137,
+      2731
+    ],
+    [
+      3327,
+      15765
+    ]
+  ],
+  "train_time_s": 0.8730769157409668,
+  "inference_time_s": 49.7044472694397
+}
