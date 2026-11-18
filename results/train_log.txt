@@ -1,0 +1,41 @@
+== logreg (Linear / probabilistic)
+  [logreg] fold 0: macro F1=0.8157
+  [logreg] fold 1: macro F1=0.8152
+  [logreg] fold 2: macro F1=0.8393
+  [logreg] fold 3: macro F1=0.8443
+  [logreg] fold 4: macro F1=0.8158
+  -> test top1=0.8479 macroF1=0.8287 logloss=0.2277
+== rf (Ensemble (bagging))
+  [rf] fold 0: macro F1=0.8732
+  [rf] fold 1: macro F1=0.8795
+  [rf] fold 2: macro F1=0.9102
+  [rf] fold 3: macro F1=0.9250
+  [rf] fold 4: macro F1=0.8836
+  -> test top1=0.8549 macroF1=0.8974 logloss=0.1395
+== lgbm (Boosting)
+  [lgbm] fold 0: macro F1=0.8717
+  [lgbm] fold 1: macro F1=0.8732
+  [lgbm] fold 2: macro F1=0.9045
+  [lgbm] fold 3: macro F1=0.9155
+  [lgbm] fold 4: macro F1=0.8786
+  -> test top1=0.8604 macroF1=0.8897 logloss=0.1419
+== mlp (Neural network)
+  [mlp] fold 0: macro F1=0.8901
+  [mlp] fold 1: macro F1=0.8934
+  [mlp] fold 2: macro F1=0.9187
+  [mlp] fold 3: macro F1=0.9353
+  [mlp] fold 4: macro F1=0.8990
+  -> test top1=0.8565 macroF1=0.9157 logloss=0.0992
+== knn (Instance-based)
+  [knn] fold 0: macro F1=0.8865
+  [knn] fold 1: macro F1=0.8893
+  [knn] fold 2: macro F1=0.9111
+  [knn] fold 3: macro F1=0.9227
+  [knn] fold 4: macro F1=0.8947
+  -> test top1=0.8485 macroF1=0.9069 logloss=0.1470
+ model                 family  cv_macro_f1_mean  cv_macro_f1_std  train_macro_f1  test_macro_f1  test_precision  test_recall  test_log_loss  test_top1_accuracy  train_time_s  inference_time_s
+  lgbm               Boosting          0.888708         0.017883        0.900048       0.889723        0.710384     0.954955       0.141915            0.860386     10.839860          0.610681
+   mlp         Neural network          0.907300         0.017159        0.914204       0.915676        0.867549     0.840876       0.099219            0.856472     22.840627          0.085791
+    rf     Ensemble (bagging)          0.894289         0.019878        0.896987       0.897437        0.736392     0.942437       0.139501            0.854906     26.794159          0.251335
+   knn         Instance-based          0.900836         0.013868        1.000000       0.906916        0.852346     0.825739       0.146993            0.848539      0.873077         49.704447
+logreg Linear / probabilistic          0.826067         0.012961        0.825726       0.828732        0.582741     0.936256       0.227736            0.847860      7.103755          0.018951
