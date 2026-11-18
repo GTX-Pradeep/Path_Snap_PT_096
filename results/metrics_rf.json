@@ -1,0 +1,53 @@
+{
+  "model": "rf",
+  "family": "Ensemble (bagging)",
+  "config": {
+    "bootstrap": "True",
+    "ccp_alpha": "0.0",
+    "class_weight": "balanced_subsample",
+    "criterion": "gini",
+    "max_depth": "12",
+    "max_features": "sqrt",
+    "max_leaf_nodes": "None",
+    "max_samples": "0.2",
+    "min_impurity_decrease": "0.0",
+    "min_samples_leaf": "5",
+    "min_samples_split": "2",
+    "min_weight_fraction_leaf": "0.0",
+    "monotonic_cst": "None",
+    "n_estimators": "100",
+    "n_jobs": "-1",
+    "oob_score": "False",
+    "random_state": "42",
+    "verbose": "0",
+    "warm_start": "False"
+  },
+  "train_rows": 1383341,
+  "cv_macro_f1_folds": [
+    0.8731862130283654,
+    0.8794877468846541,
+    0.9102461926175494,
+    0.9249711986015412,
+    0.8835519328452743
+  ],
+  "cv_macro_f1_mean": 0.8942886567954769,
+  "cv_macro_f1_std": 0.019878222402965797,
+  "train_macro_f1": 0.8969870616376661,
+  "test_macro_f1": 0.8974371518550934,
+  "test_precision": 0.7363919129082426,
+  "test_recall": 0.9424366226691808,
+  "test_log_loss": 0.13950070532368586,
+  "test_top1_accuracy": 0.8549060542797495,
+  "test_confusion_matrix": [
+    [
+      114427,
+      6441
+    ],
+    [
+      1099,
+      17993
+    ]
+  ],
+  "train_time_s": 26.794159412384033,
+  "inference_time_s": 0.25133514404296875
+}
