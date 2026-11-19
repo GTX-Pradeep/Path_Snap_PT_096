@@ -1,0 +1,6 @@
+# keep model and data files byte-exact on every OS (no LF/CRLF conversion)
+models/** -text
+*.joblib binary
+*.parquet binary
+*.txt -text
+*.ipynb -text

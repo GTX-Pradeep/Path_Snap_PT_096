@@ -26,7 +26,10 @@ class PathSnapPredictor:
         if self.cfg.get("booster_file"):
             # LightGBM's own text format: loads with any scikit-learn version / Python 3.10+
             import lightgbm as lgb
-            booster = lgb.Booster(model_file=str(MODELS / self.cfg["booster_file"]))
+            # read as text and normalise line endings: Git on Windows may convert LF -> CRLF,
+            # which LightGBM's parser rejects ("Model format error, expect a tree here")
+            text = (MODELS / self.cfg["booster_file"]).read_bytes().decode("utf-8").replace("\r\n", "\n")
+            booster = lgb.Booster(model_str=text)
             self.predict_proba = lambda X: booster.predict(X)
         else:
             model = joblib.load(MODELS / self.cfg["model_file"])
