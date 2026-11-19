@@ -22,15 +22,22 @@ MODELS = ROOT / "models"
 class PathSnapPredictor:
     def __init__(self, config_path=MODELS / "final_config.json"):
         self.cfg = json.load(open(config_path))
-        self.model = joblib.load(MODELS / self.cfg["model_file"])
         self.features = self.cfg["features"]
+        if self.cfg.get("booster_file"):
+            # LightGBM's own text format: loads with any scikit-learn version / Python 3.10+
+            import lightgbm as lgb
+            booster = lgb.Booster(model_file=str(MODELS / self.cfg["booster_file"]))
+            self.predict_proba = lambda X: booster.predict(X)
+        else:
+            model = joblib.load(MODELS / self.cfg["model_file"])
+            self.predict_proba = lambda X: model.predict_proba(X)[:, 1]
 
     def predict(self, trip):
         assert trip.get("route") is None, "reference route must not enter the prediction pipeline"
         t0 = time.time()
         cands, g = candidate_table(trip, k=self.cfg["k_candidates"], with_labels=False)
         t1 = time.time()
-        cands["proba"] = self.model.predict_proba(cands[self.features].to_numpy())[:, 1]
+        cands["proba"] = self.predict_proba(cands[self.features].to_numpy())
         t2 = time.time()
         dec = TripDecoder(g, cands, self.cfg["hmm_params"])
         hmm_arcs = dec.decode()

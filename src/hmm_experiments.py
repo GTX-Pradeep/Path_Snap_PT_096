@@ -156,5 +156,8 @@ if __name__ == "__main__":
     cfg = {"model_file": f"{FINAL_MODEL}.joblib", "model_name": FINAL_MODEL, "features": FEATURES,
            "k_candidates": K_CANDIDATES, "hmm_params": params, "decoder_tuned_on_train_trips": tune_trips,
            "decoder_tuning_classifier_only_accuracy": base}
+    if FINAL_MODEL.startswith("lgbm"):  # version-independent copy of the final model for the API
+        joblib.load(MOD / f"{FINAL_MODEL}.joblib").booster_.save_model(str(MOD / f"{FINAL_MODEL}.txt"))
+        cfg["booster_file"] = f"{FINAL_MODEL}.txt"
     json.dump(cfg, open(MOD / "final_config.json", "w"), indent=2)
     print("wrote models/final_config.json")

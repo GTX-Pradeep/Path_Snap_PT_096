@@ -23,7 +23,7 @@ route continuity **98.14%** (classifier only 93.54%), disconnected steps 1237 �
 | | Laptop 1 — **API** | Laptop 2 — **UI** |
 |---|---|---|
 | Runs | model + HMM/Viterbi + road networks + scoring (FastAPI, port 8000) | browser interface (static files, port 8080) |
-| Needs | this repo, Python 3.11–3.13, `requirements.txt`, the evaluation trips | this repo (only the `ui/` folder is used), Python (or any static web server) |
+| Needs | this repo, Python 3.10–3.13, `requirements.txt`, the evaluation trips | this repo (only the `ui/` folder is used), Python (or any static web server) |
 
 ### Laptop 1 — API
 1. Install:
@@ -153,7 +153,7 @@ python plot_results.py         # comparison plots              -> results/plots/
 python route_maps.py           # Folium route maps             -> maps/
 python ../report/make_report.py  # technical report (HTML + PDF) from the result files
 ```
-Seed 42 everywhere. If a saved model fails to load because of a different scikit-learn or LightGBM version, install the
+Seed 42 everywhere. The API loads the final model from `models/lgbm_tuned.txt` (LightGBM text format), which works with any scikit-learn version. The other `models/*.joblib` files (used by notebooks) need scikit-learn 1.9.1 + LightGBM 4.7.0; if they fail to load, install those versions (Python 3.11+) or
 pinned versions from `requirements.txt`, or retrain with the commands above.
 
 ## 6. Data and integrity rules followed
