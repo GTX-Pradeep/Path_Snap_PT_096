@@ -153,8 +153,7 @@ python plot_results.py         # comparison plots              -> results/plots/
 python route_maps.py           # Folium route maps             -> maps/
 python ../report/make_report.py  # technical report (HTML + PDF) from the result files
 ```
-Seed 42 everywhere. The API loads the final model from `models/lgbm_tuned.txt` (LightGBM text format), which works with any scikit-learn version. The other `models/*.joblib` files (used by notebooks) need scikit-learn 1.9.1 + LightGBM 4.7.0; if they fail to load, install those versions (Python 3.11+) or
-pinned versions from `requirements.txt`, or retrain with the commands above.
+Seed 42 everywhere. The API loads the final model from `models/lgbm_tuned.txt` (LightGBM text format), which works with any scikit-learn version. The other `models/*.joblib` files (used by notebooks) need scikit-learn 1.9.1 + LightGBM 4.7.0; if they fail to load, install those versions (Python 3.11+) or retrain with the commands above.
 
 ## 6. Data and integrity rules followed
 * Train (80 trips): fitting, cross-validation, Bayesian optimisation and decoder tuning. Student-test (10 trips): model comparison only.
