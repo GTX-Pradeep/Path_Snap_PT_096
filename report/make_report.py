@@ -23,7 +23,8 @@ def img(path, caption, width=100):
     if not p.exists():
         return f"<p class='missing'>[missing figure: {path}]</p>"
     b64 = base64.b64encode(p.read_bytes()).decode()
-    return (f"<figure><img src='data:image/png;base64,{b64}' style='width:{width}%'>"
+    mime = "image/jpeg" if p.suffix.lower() in (".jpg", ".jpeg") else "image/png"
+    return (f"<figure><img src='data:{mime};base64,{b64}' style='width:{width}%'>"
             f"<figcaption>{caption} <span class='src'>({path})</span></figcaption></figure>")
 
 
@@ -70,56 +71,57 @@ def hmm_row(model, method):
 def fit_verdict(m):
     gap = m["train_macro_f1"] - m["cv_macro_f1_mean"]
     if gap > 0.05:
-        return (f"<b>Overfitting.</b> Train macro F1 ({m['train_macro_f1']:.3f}) is clearly above CV "
-                f"({m['cv_macro_f1_mean']:.3f}) and student-test ({m['test_macro_f1']:.3f}): the model fits its "
-                f"training rows much better than unseen trips.")
+        return (f"<b>Yes, it overfits.</b> On the rows it was trained on it scores {m['train_macro_f1']:.3f}, but only "
+                f"{m['cv_macro_f1_mean']:.3f} in cross-validation and {m['test_macro_f1']:.3f} on student-test. In other words it "
+                f"remembers its training rows far better than it handles trips it has not seen.")
     if m["cv_macro_f1_mean"] < 0.85:
-        return (f"<b>Slight underfitting, no overfitting.</b> Train ({m['train_macro_f1']:.3f}), CV "
-                f"({m['cv_macro_f1_mean']:.3f}) and student-test ({m['test_macro_f1']:.3f}) macro F1 are almost equal "
-                f"but lower than the non-linear models: the model capacity, not the data, limits it.")
-    return (f"<b>Good fit.</b> Train ({m['train_macro_f1']:.3f}), CV ({m['cv_macro_f1_mean']:.3f} ± "
-            f"{m['cv_macro_f1_std']:.3f}) and student-test ({m['test_macro_f1']:.3f}) macro F1 are close, so it "
-            f"generalises to unseen trips without memorising the training trips.")
+        return (f"<b>It underfits a little, but does not overfit.</b> Train ({m['train_macro_f1']:.3f}), CV "
+                f"({m['cv_macro_f1_mean']:.3f}) and student-test ({m['test_macro_f1']:.3f}) scores are almost the same, yet all "
+                f"three sit below the tree and neural models. The model is simply too simple for the problem; more data would not fix that.")
+    return (f"<b>Neither.</b> Train ({m['train_macro_f1']:.3f}), CV ({m['cv_macro_f1_mean']:.3f} ± "
+            f"{m['cv_macro_f1_std']:.3f}) and student-test ({m['test_macro_f1']:.3f}) scores are close together, so what it "
+            f"learned carries over to new trips instead of being memorised.")
 
 
 WHY = {
- "logreg": ("Each candidate is a yes/no decision (is this the true arc?), and logistic regression is the standard "
-            "probabilistic baseline for that. It outputs calibrated probabilities that the HMM can use directly as "
-            "emissions, trains in seconds, and its coefficients show how each feature pushes a candidate up or down.",
-            "Strengths: fast, interpretable, stable across folds, good probabilities. Limitations: a linear decision "
-            "boundary cannot express interactions such as <i>close AND same direction</i>; balanced class weights give "
-            "high recall but low precision.",
-            "Binary cross-entropy (log loss) with L2 regularisation (C=1.0), lbfgs solver."),
- "rf": ("The right arc depends on feature interactions (distance only matters if the heading also agrees). An "
-        "ensemble of decision trees learns such rules without feature scaling and is robust to the outliers found "
-        "in EDA (jumps, gaps). Averaging many trees on bootstrap samples gives stable probabilities.",
-        "Strengths: non-linear, robust, little tuning needed, feature importances. Limitations: slower to train "
-        "and larger on disk (~8 MB) than linear or boosted models; probabilities are averaged votes, less sharp "
-        "than boosting.",
-        "Each tree minimises Gini impurity at every split; the forest averages tree probabilities."),
- "knn": ("A candidate that looks like training candidates that were correct is probably correct: KNN scores a "
-         "candidate by the labels of its 25 most similar training candidates in standardised feature space. It "
-         "is a non-parametric reference point with no training phase.",
-         "Strengths: no model assumptions, captures local structure. Limitations: memorises the training set, "
-         "prediction cost grows with the number of stored rows (fitted on a 300k subsample, still the slowest "
-         "inference), very sensitive to feature scaling, model file too large for GitHub (43 MB).",
-         "No loss is optimised (lazy learner); prediction = distance-weighted vote of the 25 nearest neighbours "
-         "(Euclidean distance on standardised features)."),
- "lgbm": ("Gradient boosting adds trees one at a time, each correcting the errors of the previous ones, which "
-          "suits tabular features with interactions. LightGBM's histogram algorithm trains on ~1.4M rows in "
-          "seconds and predicts fast enough for the live API.",
-          "Strengths: strong accuracy on tabular data, fast training and inference, handles imbalance "
-          "(is_unbalance), compact model (~1 MB). Limitations: many hyperparameters, can overfit with deep trees, "
-          "less interpretable than a linear model.",
-          "Binary log loss minimised by gradient boosting (second-order, leaf-wise trees)."),
- "mlp": ("A neural network can learn smooth non-linear combinations of all 14 features; it is the neural-network "
-         "family required for comparison, and it is the only model here that produces an epoch-wise training history.",
-         "Strengths: flexible non-linear model, best-calibrated probabilities in our experiments (lowest log loss). "
-         "Limitations: needs feature scaling and a subsample for training time, sensitive to learning rate and "
-         "initialisation, a black box.",
-         "Binary cross-entropy minimised with Adam (lr 1e-3), L2 penalty alpha=1e-4, early stopping on a 10% validation split."),
+ "logreg": ("For every candidate we are asking a yes/no question: is this the road the car was on? Logistic regression is "
+            "the natural first model for that kind of question. It gives probabilities we can hand straight to the HMM, it "
+            "trains in a few seconds, and its weights tell us which features push a candidate up or down. We used it as our baseline.",
+            "Good: quick, easy to read, very stable from fold to fold. Bad: it draws a straight-line boundary, so it cannot "
+            "learn rules like <i>close to the road AND pointing the same way</i>. The balanced class weights also make it "
+            "say yes too often, which is why its recall is high and its precision is low.",
+            "Log loss (binary cross-entropy) plus an L2 penalty (C=1.0), minimised with the lbfgs solver."),
+ "rf": ("Picking the right road depends on features working together: being close only counts if the direction also "
+        "matches. Decision trees pick up that kind of rule on their own, they do not care about feature scaling, and "
+        "they cope well with the odd jumps and gaps we saw in the EDA. Averaging 100 trees smooths out the noise of any single tree.",
+        "Good: handles non-linear rules, robust, works well with little tuning, and shows feature importance. Bad: "
+        "slower to train and bigger on disk (about 8 MB) than the linear or boosted models, and its probabilities "
+        "(averaged votes) are a bit blunter than boosting's.",
+        "Every split in every tree is chosen to reduce Gini impurity; the forest then averages the trees' probabilities."),
+ "knn": ("The idea is simple: if a candidate looks like training candidates that turned out to be correct, it is "
+         "probably correct too. KNN looks up the 25 most similar training candidates and lets them vote. It makes "
+         "no assumptions about the shape of the boundary, which made it a useful point of comparison.",
+         "Good: no assumptions, picks up local patterns. Bad: it effectively memorises the training set, prediction "
+         "gets slower the more rows it stores (even on a 300k subsample it was by far our slowest model), it depends "
+         "heavily on feature scaling, and the saved model (43 MB) was too big to upload to GitHub.",
+         "Nothing is optimised during training (it is a lazy learner). A prediction is a distance-weighted vote of the "
+         "25 nearest neighbours, using Euclidean distance on standardised features."),
+ "lgbm": ("Boosting builds trees one after another, and each new tree focuses on the mistakes of the ones before it. "
+          "That works very well on tabular features like ours. LightGBM in particular trains on our 1.4 million rows "
+          "in seconds and predicts fast enough for a live API, which mattered for the demo.",
+          "Good: very accurate on this kind of data, fast in both training and prediction, handles the class imbalance, "
+          "and the model file is small (about 1 MB). Bad: lots of hyperparameters to get right, deep trees can "
+          "overfit, and it is harder to explain than a linear model.",
+          "Log loss, minimised by gradient boosting with leaf-wise trees."),
+ "mlp": ("A small neural network can learn smooth, non-linear mixes of all 14 features at once. We wanted one model "
+         "from the neural-network family in the comparison, and it is also the only one of our models that gives a "
+         "real training curve over epochs.",
+         "Good: flexible, and in our runs it gave the most trustworthy probabilities (lowest log loss). Bad: needs scaled "
+         "features, we had to train it on a subsample to keep the time reasonable, results move with the learning rate "
+         "and random start, and it is hard to look inside.",
+         "Log loss, minimised with Adam (learning rate 1e-3), with a small L2 penalty (alpha=1e-4) and early stopping on a 10% validation split."),
 }
-WHY["lgbm_tuned"] = (WHY["lgbm"][0] + " This is the selected model, tuned with Bayesian optimisation (Section 4).",
+WHY["lgbm_tuned"] = (WHY["lgbm"][0] + " This is the version we finally used, after Bayesian tuning (Section 4).",
                      WHY["lgbm"][1], WHY["lgbm"][2])
 
 
@@ -128,15 +130,14 @@ def model_section(i, k):
     why, strength, loss = WHY[k]
     extra = ""
     if "loss_curve" in m:
-        extra = (f"<p>The MLP stopped after {len(m['loss_curve'])} epochs (early stopping). The training loss fell from "
-                 f"{m['loss_curve'][0]:.4f} to {m['loss_curve'][-1]:.4f}; validation accuracy is shown in the diagnostics "
-                 f"figure (right panel). This is the only model with an epoch-wise history; no artificial curves are drawn "
-                 f"for the others.</p>")
+        extra = (f"<p>Early stopping ended training after {len(m['loss_curve'])} epochs. Over that time the training loss "
+                 f"dropped from {m['loss_curve'][0]:.4f} to {m['loss_curve'][-1]:.4f}; the validation accuracy is in the right "
+                 f"panel of the figure below. The other models do not train in epochs, so we did not draw curves for them.</p>")
     clf = hmm_row(k, "classifier only"); hm = hmm_row(k, "classifier + HMM")
     hmm_txt = ""
     if clf is not None:
-        hmm_txt = (f" Route continuity of its argmax predictions is {pct(clf.route_continuity)} "
-                   f"({int(clf.breaks)} breaks); with HMM decoding pointwise accuracy becomes {pct(hm.pointwise_accuracy)}.")
+        hmm_txt = (f" Taking its top candidate for every point gives a route continuity of {pct(clf.route_continuity)} "
+                   f"({int(clf.breaks)} breaks); after HMM decoding its pointwise accuracy goes up to {pct(hm.pointwise_accuracy)}.")
     return f"""
 <h3>3.2.{i} {NAMES[k]} ({m['family']})</h3>
 <p><b>A1. Why suitable?</b> {why}</p>
@@ -196,37 +197,48 @@ code {{ font-size: 9pt; background:#f1f3f6; padding: 0 3px; }} pre {{ background
 </style></head><body>
 <div class='title'><h1>PathSnap — Distributed Map-Matching &amp; Route Reconstruction</h1>
 <div class='muted'>Technical report · UE24CS352A Machine Learning Hackathon · PES University · Team PT_096</div>
-<div class='muted'>Team: Pradeep, Poojitha, Pandu, Pavan · Repository: <a href='{GH}'>{GH}</a></div></div>
+<table style='width:auto;margin-top:8px'><thead><tr><th>Name</th><th>SRN</th><th>Main contribution</th></tr></thead><tbody>
+<tr><td>Pandu</td><td>PES1UG24AM382</td><td>KNN, MLP, Bayesian hyperparameter optimisation</td></tr>
+<tr><td>Pavan</td><td>PES1UG24AM383</td><td>LightGBM, HMM / Viterbi decoder</td></tr>
+<tr><td>Poojitha</td><td>PES1UG24AM384</td><td>EDA, Folium maps, Random Forest, evaluator UI</td></tr>
+<tr><td>Pradeep</td><td>PES1UG24AM385</td><td>Data pipeline and features, Logistic Regression, FastAPI backend, report</td></tr>
+</tbody></table>
+<div class='muted'>Repository: <a href='{GH}'>{GH}</a></div></div>
 
-<div class='box'><b>Summary.</b> Noisy GPS points are matched to the road network in two stages: a classifier scores the 8 nearest
-road segments of every GPS point, then an HMM/Viterbi decoder uses road connectivity to pick one connected route.
-Five classifier families were compared; LightGBM was selected and tuned with Bayesian optimisation. On the 10 student-test trips the
-final system reaches <b>{pct(final_h.pointwise_accuracy)}</b> pointwise accuracy (classifier only: {pct(final_c.pointwise_accuracy)}),
-route continuity <b>{pct(final_h.route_continuity)}</b> (classifier only: {pct(final_c.route_continuity)}) and route F1 {f3(final_h.route_f1)}.
-The system runs as a FastAPI backend (Laptop 1) and a browser UI (Laptop 2).</div>
+<div class='box'><b>In short.</b> We snap noisy GPS points to the road network in two steps. First, a classifier looks at the 8
+nearest road segments around each GPS point and scores how likely each one is. Then an HMM with Viterbi decoding uses how the roads
+connect to choose one route that actually makes sense. We tried five kinds of classifier, picked LightGBM and tuned it with Bayesian
+optimisation. On the 10 student-test trips the full system gets <b>{pct(final_h.pointwise_accuracy)}</b> of points right
+(the classifier alone gets {pct(final_c.pointwise_accuracy)}), keeps the route connected <b>{pct(final_h.route_continuity)}</b> of the time
+(classifier alone: {pct(final_c.route_continuity)}) and reaches a route F1 of {f3(final_h.route_f1)}. It runs as a FastAPI server on one
+laptop and a browser UI on a second laptop.</div>
 
 <h2>1. Problem and approach</h2>
-<p>GPS fixes drift off the road (buildings, multipath, dropouts), so a vehicle appears on parallel streets or between roads.
-PathSnap reconstructs the road segments actually driven. Pipeline: clean GPS → project to metres → 8 candidate arcs per GPS point →
-14 features per (point, candidate) → classifier probability that the candidate is the true arc → HMM/Viterbi over the candidates →
-one arc per GPS point and an ordered route. Laptop 1 hosts the model, decoder, road networks and evaluation; Laptop 2 hosts the UI.</p>
+<p>A GPS fix is rarely exactly on the road. Tall buildings, reflections and short signal losses push points sideways, so on a plain
+map a car seems to jump onto parallel streets or drive through blocks. Our goal was to work out which road segments the car really used.
+The steps are: clean the GPS points, convert them to metres, collect the 8 nearest road segments for every point, compute 14 features
+for each point–segment pair, let the classifier score every pair, and finally let the HMM/Viterbi decoder choose one connected route.
+Laptop 1 holds the model, the decoder, the road networks and the scoring; Laptop 2 only shows the interface.</p>
 
 <h2>2. Dataset understanding and exploratory data analysis</h2>
-<p><b>Partitions used:</b> train (80 trips) for all fitting, cross-validation, Bayesian optimisation and decoder tuning; student_test (10 trips)
-for model comparison; evaluator_test (10 trips) only inside the API at demonstration time. All EDA below uses train + student_test
-(columns marked per partition).</p>
+<p><b>Which data we used where:</b> the 80 training trips for all training, cross-validation, Bayesian tuning and decoder tuning; the
+10 student-test trips only to compare models; the 10 evaluator trips only inside the API during the demo. The EDA in this section covers
+train and student-test, and the tables say which partition each number comes from.</p>
 <h3>2.1 How we preprocessed the data</h3>
 <ul>
 <li><b>Reading.</b> <code>.track</code> (lon, lat, t), <code>.nodes</code> (lon, lat; row = node id), <code>.arcs</code> (from, to; row = arc id, directed),
 <code>.route</code> (ordered arc ids). Column order was verified per trip (longitude first, latitude second; all values in range). The trips are spread over several cities worldwide (latitudes −35° to 62°, longitudes −100° to 137°).</li>
-<li><b>Cleaning.</b> Drop NaN or out-of-range coordinates, sort by time, drop duplicate timestamps (none were found).</li>
+<li><b>Cleaning.</b> We drop missing or out-of-range coordinates, sort by time and remove repeated timestamps. In practice none of these problems showed up.</li>
 <li><b>Projection.</b> Degrees are angles and the metres-per-degree of longitude shrinks with latitude (at 56°N, 1° of longitude ≈ 0.56 of 1° of latitude), and the trips lie in different cities, so every trip is projected to a local equirectangular plane in metres centred on the trip.</li>
-<li><b>Candidates.</b> Arcs are sampled every 15 m into a KD-tree; the 8 nearest distinct arcs (exact point-to-segment distance) are the candidates of a GPS point.</li>
-<li><b>Per-point labels.</b> <code>.route</code> has no timestamps, so GPS points are aligned to it with a monotonic dynamic-programming alignment
-(route index never decreases, total point-to-arc distance minimised). A candidate is positive if it is the aligned arc (≈1 in 8 candidates).</li>
-<li><b>Label cleaning (train only).</b> Observations whose aligned reference arc is &gt; 50 m away are removed from training
-(11% of training observations, mainly trips 33 and 54 whose reference route does not follow the GPS). Student-test is never filtered.
-Candidate miss rate (true arc not among the 8): train 8.2% → 0.85% after cleaning; student-test 0.35%.</li>
+<li><b>Candidates.</b> We place a point every 15 m along every road segment and put them all in a KD-tree. For each GPS point we take the 8 closest different segments, measured exactly from the point to the segment.</li>
+<li><b>Labels for each point.</b> The <code>.route</code> file lists the roads in order but says nothing about time, so it does not tell us which
+road belongs to which GPS point. We solved this with a small dynamic-programming alignment: points are matched to route segments in order (never
+going back along the route) so that the total distance is as small as possible. The candidate equal to the matched segment is the positive one,
+which is roughly 1 in every 8 candidates.</li>
+<li><b>Cleaning the labels (training only).</b> In trips 33 and 54 the reference route is mostly more than 100 m away from the GPS, so it clearly
+does not describe those points. We dropped training points whose matched reference segment was more than 50 m away (11% of training points).
+We never filtered the student-test data. After this, the share of training points whose true segment was missing from the 8 candidates fell from
+8.2% to 0.85%; on student-test it is 0.35%.</li>
 </ul>
 <h3>2.2 Missing values and data quality</h3>
 {table(pd.DataFrame([
@@ -244,8 +256,9 @@ Candidate miss rate (true arc not among the 8): train 8.2% → 0.85% after clean
  {"Check": "Consecutive route arcs connected (min over trips)", "train": f"{tr.route_consecutive_connected.min():.3f}", "student_test": f"{te.route_consecutive_connected.min():.3f}"},
 ]))}
 <h3>2.3 Patterns observed and features extracted</h3>
-<p>GPS points lie near, not on, the roads (typically a few to ~20 m off); dense junctions and parallel roads create several
-plausible candidates; two-way roads are two directed arcs; some trips have long dropouts. The features answer these observations:</p>
+<p>A few things stood out. GPS points sit near the road but rarely on it, usually a few metres and sometimes 20 m away. Busy junctions
+and parallel streets give several believable candidates. A two-way street is stored as two separate one-way segments. And some trips have
+long gaps in the signal. We chose the features below with these observations in mind:</p>
 {table(pd.DataFrame([
  {"Feature": "dist, dist_rank, dist_minus_min, dist_ratio_min", "Why": "closeness to the GPS point, absolute and relative to the other candidates"},
  {"Feature": "heading_diff, heading_diff_cos", "Why": "GPS heading vs arc direction: separates the two directions of a road and crossing streets"},
@@ -264,18 +277,19 @@ plausible candidates; two-way roads are two directed arcs; some trips have long 
 <p>Interactive Folium map (EDA): <code>maps/trip_train_00000010.html</code> (raw GPS, reference route, road network, layer control); generated by <code>src/make_map.py</code>.</p>
 
 <h2>3. Model experimentation and comparison</h2>
-<p><b>Protocol (identical for every model).</b> Candidate rows from the 80 training trips (label-cleaned) are used for 5-fold
-<b>GroupKFold by trip</b> (no trip in both training and validation folds) → CV macro F1; the model is refitted on all training rows and
-evaluated on the 10 student-test trips. <b>Primary selection metric: observation-level Top-1 accuracy</b> — for each GPS point the
-highest-scoring candidate is compared with the reference arc — because it is exactly the map-matching decision; log loss is used as a
-second criterion because the HMM consumes the probabilities. Seed 42 everywhere; logs in <code>results/train_log.txt</code>.</p>
+<p><b>How we tested every model (the same way each time).</b> We ran 5-fold cross-validation on the 80 training trips with
+<b>GroupKFold by trip</b>, so all the points of one trip are always in the same fold; otherwise neighbouring points from one trip would
+leak between training and validation. After that we trained on all 80 trips and scored the 10 student-test trips. <b>Our main metric is
+Top-1 accuracy per GPS point</b>: take the best-scoring candidate for a point and check whether it is the reference segment. That is exactly
+the decision map matching has to make. Log loss was our second criterion, because the HMM uses the probabilities directly. We used seed 42
+throughout; the full log is in <code>results/train_log.txt</code>.</p>
 <h3>3.1 Overall model comparison</h3>
 {table(comp)}
 <p class='muted'>Route continuity here = share of consecutive GPS points whose argmax arcs are identical or directly connected (classifier only, before HMM).</p>
-<p><b>Model selection.</b> LightGBM had the best student-test Top-1 accuracy of the five untuned models, near-best log loss, the second-fastest
-training and sub-second inference, and a 1 MB model file — the best fit for a live API and for the sequential decoder. The MLP had the
-lowest log loss but needs a subsample to train in reasonable time; KNN overfits and is slow at inference; logistic regression underfits;
-random forest is close but larger and slower. LightGBM was therefore tuned (Section 4) and used as the final classifier.</p>
+<p><b>Why we picked LightGBM.</b> Of the five untuned models it had the best Top-1 accuracy, its log loss was close to the best, it
+trained quickly, it predicts in under a second and its model file is only about 1 MB. All of that suits a live API and the decoder. The MLP
+had the lowest log loss, but we could only train it on a subsample in reasonable time. KNN overfits and is very slow to predict. Logistic
+regression underfits. Random forest came close but is bigger and slower. So we tuned LightGBM (Section 4) and used it as the final classifier.</p>
 <h3>3.2 Per-model questions</h3>
 {''.join(model_section(i + 1, k) for i, k in enumerate(ORDER))}
 <h3>3.3 Model visualisations</h3>
@@ -286,74 +300,82 @@ random forest is close but larger and slower. LightGBM was therefore tuned (Sect
 <h2>4. Bayesian hyperparameter optimisation (LightGBM)</h2>
 <p><b>1. Hyperparameters searched / 2. ranges:</b></p>
 {table(pd.DataFrame([{"Hyperparameter": k, "Range / distribution": v} for k, v in BO["search_space"].items()]))}
-<p><b>3. Objective:</b> {BO['objective']} on the 80 training trips (maximised). Sampler: {BO['sampler']}; {BO['pruner']} stops unpromising trials after their first folds.
-Trial 0 was seeded with the untuned defaults.</p>
+<p><b>3. Objective:</b> we maximised the {BO['objective']}, using the 80 training trips only. Optuna's TPE sampler ({BO['sampler']}) picks each new
+setting based on how earlier ones scored, and a {BO['pruner']} drops a trial early if its first fold already looks weak. We made trial 0 the untuned
+default settings, so the search had to beat our starting point.</p>
 <p><b>4. Trials:</b> {BO['n_trials']} ({BO['n_complete']} completed, {BO['n_pruned']} pruned); search time {BO['search_time_s'] / 60:.1f} min. Every trial is stored in <code>results/bayes_opt/trials.csv</code>.</p>
 <p><b>5. Best values:</b> {CONFIG.get('lgbm_tuned', '')} (3-fold CV macro F1 {BO['best_cv3_macro_f1']:.4f}).</p>
-<p><b>6. Did tuning help?</b> {"Yes." if better else "Only partly."} Same data partitions and metrics for both:</p>
+<p><b>6. Did tuning help?</b> {"Yes, on every quality metric, at the cost of a slower model." if better else "Only partly."} Both versions were measured on the same data in the same way:</p>
 {table(tvu_tab)}
 {img("results/bayes_opt/optimisation_history.png", "Optimisation history: every completed trial and the best value so far.", 70)}
 {img("results/bayes_opt/param_importance.png", "Hyperparameter importance (fANOVA) estimated from the trials.", 60)}
 
 <h2>5. HMM and Viterbi route reconstruction</h2>
-<p><b>1. Hidden states.</b> For GPS point <i>i</i>, the states are its 8 candidate arcs; state <i>j</i> at time <i>i</i> is always the arc
-<code>cand[i, j]</code>, so the candidate-to-segment correspondence is preserved and the decoder returns one arc per GPS point.</p>
-<p><b>2. Emissions.</b> log P(candidate is the true arc) from the final classifier, multiplied by an emission weight w.</p>
-<p><b>3. Transitions.</b> Between consecutive points the vehicle drives along the network, so the network distance between the two matched
-positions should equal the straight GPS step: <code>route_d = rest of arc a + shortest path(end of a → start of b) + part of arc b</code>
+<p><b>1. Hidden states.</b> At GPS point <i>i</i> the hidden states are its 8 candidate segments. State <i>j</i> at point <i>i</i> always stands for the
+same segment <code>cand[i, j]</code>, so we never lose track of which road a state means, and the decoder ends up with exactly one segment per GPS point.</p>
+<p><b>2. Emissions.</b> The log of the classifier's probability that the candidate is the right segment, multiplied by a weight w.</p>
+<p><b>3. Transitions.</b> Between two GPS points the car has to drive along roads, so the driving distance between the two matched positions
+should be about the same as the straight-line distance between the GPS points: <code>route_d = rest of arc a + shortest path(end of a → start of b) + part of arc b</code>
 (Dijkstra on the directed road graph, arc lengths as weights, limit {CFG['hmm_params']['max_route_m']:.0f} m); on the same arc, the signed
 progress (frac_b − frac_a)·length, so driving backwards is penalised. <code>log T(a→b) = −|route_d − gps_d| / β</code>.</p>
 <p>Viterbi recurrence: δ<sub>i+1</sub>(b) = max<sub>a</sub>[δ<sub>i</sub>(a) + log T(a,b)] + w·log e<sub>i+1</sub>(b), with back-pointers; the best final state is traced back.</p>
-<p><b>4. Missing candidates and gaps.</b> Points with fewer than 8 candidates are padded with impossible (−∞) states. If the time gap exceeds
-{CFG['hmm_params']['gap_s']:.0f} s the transition is unconstrained (log T = 0), because after a dropout any road may be reached.</p>
-<p><b>5. Disconnected segments.</b> If arc b cannot be reached from arc a within the distance limit, log T = {CFG['hmm_params']['unreachable']:.0f}
-(a large finite penalty rather than −∞): the decoder avoids such jumps but can still make one when the classifier is very confident,
-so a path always exists.</p>
+<p><b>4. Missing candidates and gaps.</b> If a point has fewer than 8 candidates, the empty slots get an impossible score (−∞). If more than
+{CFG['hmm_params']['gap_s']:.0f} s pass between two points, we stop constraining the transition (log T = 0), because after a long signal loss the
+car could be on almost any road.</p>
+<p><b>5. Disconnected segments.</b> If segment b cannot be reached from segment a within the distance limit, the transition gets a large penalty
+of {CFG['hmm_params']['unreachable']:.0f} rather than being forbidden outright. The decoder therefore avoids such jumps, but it can still make one when
+the classifier is very sure, and it never gets stuck without a valid path.</p>
 <p><b>Decoder tuning.</b> β and w were chosen by grid search on {len(CFG.get('decoder_tuned_on_train_trips', []))} training trips using
 <b>out-of-fold</b> classifier probabilities (each trip scored by a model that never saw it), objective = pointwise accuracy. Best: β = {best_tune.beta:g} m,
 w = {best_tune.w_emit:g} (accuracy {best_tune.pointwise_accuracy:.4f} vs classifier-only {CFG.get('decoder_tuning_classifier_only_accuracy', float('nan')):.4f}
-on those trips). Student-test and evaluator data were not used for tuning.</p>
+on those trips). We did not use student-test or evaluator data for this tuning.</p>
 {img("results/hmm/decoder_tuning.png", "Decoder tuning grid (training trips, out-of-fold probabilities).", 55)}
-<p><b>6. Did HMM decoding improve the route?</b> Yes. Classifier-only vs classifier + HMM on the 10 student-test trips, for every classifier:</p>
+<p><b>6. Did HMM decoding improve the route?</b> Yes, clearly, and for every classifier we tried. Results on the 10 student-test trips:</p>
 {table(hm_tab, {"pointwise_accuracy": pct, "route_continuity": pct, "route_precision": f3, "route_recall": f3, "route_f1": f3})}
 <p>For the final model, pointwise accuracy rises from {pct(final_c.pointwise_accuracy)} to {pct(final_h.pointwise_accuracy)}, breaks fall from
-{int(final_c.breaks)} to {int(final_h.breaks)} and route F1 from {f3(final_c.route_f1)} to {f3(final_h.route_f1)}. The gain is largest for the weakest
-classifiers, because the transition model repairs isolated wrong choices.</p>
+{int(final_c.breaks)} to {int(final_h.breaks)} and route F1 from {f3(final_c.route_f1)} to {f3(final_h.route_f1)}. The weaker classifiers gain the most, because most of their
+mistakes are single points that wander onto a side street, and the transitions pull those points back onto the route.</p>
 {img("results/hmm/classifier_vs_hmm.png", "Classifier only vs classifier + HMM on student_test, for every model.", 100)}
 {img("results/hmm/per_trip_accuracy.png", f"Per-trip pointwise accuracy of {NAMES.get(FINAL, FINAL)} (student_test).", 70)}
 <p><b>Where HMM did not help.</b> {("Trips " + ", ".join(worse.index) + " got worse with HMM. ") if len(worse) else "No student-test trip got worse. "}
-In trip 00000007 the vehicle is parked for the last ~175 points on a two-way road. At standstill the GPS heading is noise, the
-classifier prefers the opposite-direction twin arc, and the accumulated emission evidence outweighs one U-turn transition, so the
-decoder switches to the wrong direction although the route geometry is the same. A heading-reliability feature (speed-aware heading)
-is the planned fix; we report the case instead of hiding it.</p>
+Trip 00000007 is the clearest case. For its last ~175 points the car is parked on a two-way street. When the car is not moving, the GPS
+heading is basically random, and the classifier starts to prefer the segment for the opposite direction. Over so many points that evidence
+outweighs the cost of one U-turn, so the decoder switches direction even though it is the same physical street. A feature that tells the model
+when the heading can be trusted (based on speed) should fix this; we have not built it yet.</p>
 {route_figs}
 
 <h2>6. Geographical visualisation using Folium</h2>
-<p>Interactive maps generated by our code (<code>src/make_map.py</code>, <code>src/route_maps.py</code>) are committed in <code>maps/</code>:
-raw GPS (blue), relevant road network (grey, toggle), reference route (green), classifier-only arcs (orange dashed) and the HMM-predicted
-route (red), with a legend, layer control and the extent fitted to the trip.</p>
+<p>Our code (<code>src/make_map.py</code>, <code>src/route_maps.py</code>) produces interactive Folium maps, which are in the <code>maps/</code> folder.
+Each map has the raw GPS (blue), the nearby road network (grey, can be switched on), the reference route (green), the classifier-only segments
+(orange, dashed) and the HMM route (red). Every map has a legend and layer controls, and it opens zoomed to the trip.</p>
 {img("report/figures/folium_route.png", "Screenshot of a Folium route map (student_test). Base-map tiles may be missing in this screenshot because it was captured in an offline environment; the layers are the real output.", 95)}
 
 <h2>7. API, UI and deployment</h2>
-<p><b>Laptop 1 — API</b> (<code>api/main.py</code>, FastAPI + uvicorn, port 8000). On start it loads <code>models/{CFG['model_file']}</code> and
-<code>models/final_config.json</code>. Endpoints: <code>GET /health</code>, <code>GET /trips</code> (the 10 evaluation trip ids),
-<code>POST /predict {{"trip_id": …}}</code>: loads the trip on the server, removes the reference route before prediction, runs candidates →
-features → classifier → HMM/Viterbi, then scores the prediction against the server-side reference route and returns GPS points, the predicted
-route geometry and the metrics. Every request is logged on the API console (trip, accuracy, continuity, route F1, time).
-Reference routes are never sent to the UI.</p>
-<p><b>Laptop 2 — UI</b> (<code>ui/</code>, static HTML/JS + Leaflet, served with <code>python -m http.server 8080</code>): enter the API address,
-see the 10 trips, click one → the UI posts the trip id to the API and shows the map (GPS, predicted route, classifier-only arcs) and the metrics.</p>
-{img("report/figures/ui.png", "Evaluator UI after running a trip (captured during testing; map tiles were blocked in the test environment).", 100)}
-{img("report/figures/api_log.png", "API console log while serving requests (captured during testing).", 100)}
-<p class='muted'>Replace these two screenshots with ones taken on the two demonstration laptops (the guidelines ask for the CMD of the receiving laptop).</p>
-<p><b>How to run</b>: see the README (Laptop 1: <code>run_api.bat</code>; Laptop 2: <code>run_ui.bat</code>, then enter <code>http://&lt;laptop-1-IP&gt;:8000</code>).</p>
+<p>We split the system across two laptops, as the guidelines ask. Both were on the same network (Laptop 1 at 10.8.121.177, Laptop 2 at 10.8.121.171).</p>
+<p><b>Laptop 1 runs the API</b> (<code>api/main.py</code>, FastAPI on port 8000, started with <code>run_api.bat</code>). On start-up it loads the final
+LightGBM model, the tuned HMM settings from <code>models/final_config.json</code> and the 10 evaluation trips. It has three endpoints:
+<code>GET /health</code>, <code>GET /trips</code> (the list of trip ids) and <code>POST /predict</code>. A <code>/predict</code> call loads the chosen trip,
+removes its reference route before anything else happens, runs candidates → features → classifier → HMM/Viterbi, and only then compares the
+result with the reference route to work out the accuracy. The reply contains the GPS points, the predicted route and the scores. The reference
+route itself never leaves Laptop 1. Every request is written to the console with the trip id, accuracy, continuity, route F1 and time taken.</p>
+<p><b>Laptop 2 runs the UI</b> (<code>ui/</code>: plain HTML, JavaScript and a bundled copy of Leaflet, served by <code>run_ui.bat</code> on port 8080).
+You type Laptop 1's address, press Connect, and the 10 trips appear. Clicking a trip sends its id to the API and then draws the result on the map,
+with the scores next to it.</p>
+{img("report/figures/demo_api_console_laptop1.jpg", "Figure 7.1 – API console on Laptop 1 during the demo. The server loads the tuned model and the 10 evaluation trips, then answers requests that come from Laptop 2 (10.8.121.171): /health, /trips, the browser's CORS check (OPTIONS) and two /predict calls. For trip 00000015 the log shows 6,854 points, 89.33% accuracy with the HMM against 58.02% for the classifier alone, in 8.1 s; for trip 00000094, 92.20% against 86.38% in 9.0 s.", 100)}
+{img("report/figures/demo_ui_laptop2.jpg", "Figure 7.2 – Evaluator UI on Laptop 2, connected to the API at http://10.8.121.177:8000 (\"connected · model lgbm_tuned · 10 trips\"). Trip 00000094 is selected: the predicted route is drawn on the OpenStreetMap background, and the panel on the left compares the classifier alone with classifier + HMM (accuracy 86.38% → 92.20%, continuity 93.53% → 97.31%, breaks 209 → 87, route F1 0.900).", 100)}
+{img("report/figures/demo_ui_server_laptop2.jpg", "Figure 7.3 – The small web server on Laptop 2 (python -m http.server 8080) that serves the UI files: the page, style sheet, script and the local Leaflet library all load with status 200. The only 404 is the browser asking for a favicon, which we do not provide.", 85)}
+<p><b>Running it</b> is described step by step in the README: on Laptop 1, put the evaluation trips in <code>data\\evaluator_test</code> and start
+<code>run_api.bat</code>; on Laptop 2, start <code>run_ui.bat</code> and enter <code>http://&lt;Laptop-1-IP&gt;:8000</code>. Two problems came up while we set
+this up on Windows. First, Python 3.10 cannot install the scikit-learn version we trained with. Second, Git changed the line endings in LightGBM's text
+model file, which LightGBM then refused to load. We solved both by exporting the 450 trees of the final model to plain numeric arrays
+(<code>models/lgbm_tuned_trees.npz</code>) and evaluating them with numpy (<code>src/tree_predictor.py</code>). It gives the same probabilities as
+LightGBM (largest difference 2·10<sup>−16</sup>) and does not depend on library versions.</p>
 
 <h2>8. Academic integrity and AI-assistance disclosure</h2>
-<p>All experiments in this report were actually run; every number and figure is produced by the code in the repository and can be regenerated
-(<code>python report/make_report.py</code> rebuilds this report from the result files). Evaluator-test data were not used for training, model
-selection, hyperparameter or decoder tuning; predictions are not hardcoded. <b>AI assistance:</b> an AI coding assistant was used to help write
-code and draft this report; the team reviewed, ran and verified the code and results and can explain every part. [Team: edit this statement
-to match the event's disclosure rules.]</p>
+<p>Every number, table and figure in this report comes from code in our repository, and <code>python report/make_report.py</code> rebuilds the whole
+report from the saved result files. The evaluator trips were not used for training, for choosing a model, or for tuning hyperparameters or the decoder;
+they only appear in the demo screenshots in Section 7. No predictions are hardcoded. <b>AI assistance:</b> we used an AI coding assistant to help write
+code and draft parts of this report. We went through the code and results ourselves and are ready to explain every part of them.</p>
 
 <h2>Appendix — reproduce</h2>
 <pre>cd src

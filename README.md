@@ -108,12 +108,12 @@ Plots: `results/plots/`, `results/bayes_opt/`, `results/hmm/`. Interactive maps:
 ---
 
 ## 3. Team and contributions
-| Member | Phase 1 (Review 1) | Phase 2 (final) |
-|---|---|---|
-| **Pradeep** | core pipeline: data loading, candidates, features, training framework; Model 1 Logistic Regression | prediction pipeline, **FastAPI backend**, deployment scripts, README, technical report |
-| **Poojitha** | EDA, Folium maps; Model 2 Random Forest | **evaluator UI**, Folium route maps (classifier vs HMM) |
-| **Pandu** | Model 3 KNN, Model 5 MLP | **Bayesian hyperparameter optimisation** (Optuna), tuned-vs-untuned comparison |
-| **Pavan** | Model 4 LightGBM | **HMM / Viterbi decoder**, decoder tuning, classifier-vs-HMM experiments |
+| Member | SRN | Phase 1 (Review 1) | Phase 2 (final) |
+|---|---|---|---|
+| **Pradeep** | PES1UG24AM385 | core pipeline: data loading, candidates, features, training framework; Model 1 Logistic Regression | prediction pipeline, **FastAPI backend**, deployment scripts, README, technical report |
+| **Poojitha** | PES1UG24AM384 | EDA, Folium maps; Model 2 Random Forest | **evaluator UI**, Folium route maps (classifier vs HMM) |
+| **Pandu** | PES1UG24AM382 | Model 3 KNN, Model 5 MLP | **Bayesian hyperparameter optimisation** (Optuna), tuned-vs-untuned comparison |
+| **Pavan** | PES1UG24AM383 | Model 4 LightGBM | **HMM / Viterbi decoder**, decoder tuning, classifier-vs-HMM experiments |
 
 ## 4. Repository layout
 ```
