@@ -18,8 +18,9 @@ def list_trips(partition):
     return sorted(p.name for p in d.iterdir() if p.is_dir())
 
 
-def load_trip(partition, trip_id):
-    d = DATA_DIR / partition / trip_id
+def load_trip(partition, trip_id, base=None):
+    """base: optional root folder (default DATA_DIR); the API passes the evaluation folder's parent."""
+    d = Path(base or DATA_DIR) / partition / trip_id
     track = pd.read_csv(d / f"{trip_id}.track", sep=r"\s+", header=None, names=["lon", "lat", "t"])
     nodes = pd.read_csv(d / f"{trip_id}.nodes", sep=r"\s+", header=None, names=["lon", "lat"])
     arcs = pd.read_csv(d / f"{trip_id}.arcs", sep=r"\s+", header=None, names=["u", "v"])

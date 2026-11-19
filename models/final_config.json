@@ -1,0 +1,51 @@
+{
+  "model_file": "lgbm_tuned.joblib",
+  "model_name": "lgbm_tuned",
+  "features": [
+    "dist",
+    "dist_rank",
+    "dist_minus_min",
+    "dist_ratio_min",
+    "heading_diff",
+    "heading_diff_cos",
+    "proj_frac",
+    "arc_len",
+    "speed",
+    "n_cand_30m",
+    "dist_prev",
+    "dist_next",
+    "out_degree",
+    "in_degree"
+  ],
+  "k_candidates": 8,
+  "hmm_params": {
+    "beta": 1.0,
+    "w_emit": 2.0,
+    "gap_s": 30.0,
+    "max_route_m": 1500.0,
+    "unreachable": -30.0
+  },
+  "decoder_tuned_on_train_trips": [
+    "00000058",
+    "00000093",
+    "00000018",
+    "00000086",
+    "00000098",
+    "00000090",
+    "00000013",
+    "00000006",
+    "00000048",
+    "00000047",
+    "00000079",
+    "00000008",
+    "00000044",
+    "00000069",
+    "00000085",
+    "00000066",
+    "00000074",
+    "00000035",
+    "00000082",
+    "00000045"
+  ],
+  "decoder_tuning_classifier_only_accuracy": 0.8762968874700718
+}

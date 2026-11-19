@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PathSnap Evaluator</title>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>PathSnap</h1>
+      <span class="sub">GPS map-matching &amp; route reconstruction · Team PT_096</span>
+    </div>
+    <form id="api-form" class="api">
+      <label for="api-url">API</label>
+      <input id="api-url" type="text" spellcheck="false" placeholder="http://192.168.x.x:8000">
+      <button type="submit">Connect</button>
+      <span id="api-status" class="status">not connected</span>
+    </form>
+  </header>
+
+  <main>
+    <aside>
+      <section>
+        <h2>Evaluation trips</h2>
+        <p class="hint">Select a trip. It is sent to the API, which runs the full pipeline on the server.</p>
+        <div id="trips" class="trips"><p class="hint">Connect to the API to load the 10 trips.</p></div>
+      </section>
+
+      <section id="results" hidden>
+        <h2>Results · trip <span id="r-trip"></span></h2>
+        <div class="kpis">
+          <div class="kpi main"><span class="v" id="k-acc">–</span><span class="l">Pointwise accuracy (HMM)</span></div>
+          <div class="kpi"><span class="v" id="k-acc-clf">–</span><span class="l">Classifier only</span></div>
+          <div class="kpi"><span class="v" id="k-cont">–</span><span class="l">Route continuity</span></div>
+          <div class="kpi"><span class="v" id="k-f1">–</span><span class="l">Route F1</span></div>
+        </div>
+        <table class="metrics">
+          <thead><tr><th>Metric</th><th>Classifier only</th><th>Classifier + HMM</th></tr></thead>
+          <tbody id="metrics-body"></tbody>
+        </table>
+        <p class="hint" id="r-meta"></p>
+      </section>
+
+      <section>
+        <h2>Request log</h2>
+        <ol id="log" class="log"></ol>
+      </section>
+    </aside>
+
+    <div class="map-wrap">
+      <div id="map"></div>
+      <div class="legend">
+        <span><i class="dot gps"></i>Raw GPS</span>
+        <span><i class="line hmm"></i>Predicted route (HMM)</span>
+        <span><i class="line clf"></i>Classifier-only arcs</span>
+      </div>
+      <div id="busy" class="busy" hidden>Running pipeline on the API…</div>
+    </div>
+  </main>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

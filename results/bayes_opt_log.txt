@@ -1,0 +1,76 @@
+[I 2026-11-18 09:54:53,693] A new study created in memory with name: lgbm_macro_f1
+[I 2026-11-18 09:55:18,344] Trial 0 finished with value: 0.8905040201759645 and parameters: {'n_estimators': 300, 'learning_rate': 0.05, 'num_leaves': 63, 'min_child_samples': 50, 'subsample': 0.8, 'colsample_bytree': 0.8, 'reg_lambda': 0.001, 'reg_alpha': 0.001, 'is_unbalance': True}. Best is trial 0 with value: 0.8905040201759645.
+trial  0 COMPLETE value=0.8905040201759645 best=0.8905
+[I 2026-11-18 09:55:48,268] Trial 1 finished with value: 0.9086694406907364 and parameters: {'n_estimators': 300, 'learning_rate': 0.17254716573280354, 'num_leaves': 118, 'min_child_samples': 75, 'subsample': 0.5780093202212182, 'colsample_bytree': 0.5779972601681014, 'reg_lambda': 0.0017073967431528124, 'reg_alpha': 2.9154431891537547, 'is_unbalance': False}. Best is trial 1 with value: 0.9086694406907364.
+trial  1 COMPLETE value=0.9086694406907364 best=0.9087
+[I 2026-11-18 09:55:59,396] Trial 2 finished with value: 0.8932983056381713 and parameters: {'n_estimators': 100, 'learning_rate': 0.18276027831785724, 'num_leaves': 158, 'min_child_samples': 20, 'subsample': 0.5909124836035503, 'colsample_bytree': 0.5917022549267169, 'reg_lambda': 0.016480446427978974, 'reg_alpha': 0.12561043700013558, 'is_unbalance': True}. Best is trial 1 with value: 0.9086694406907364.
+trial  2 COMPLETE value=0.8932983056381713 best=0.9087
+[I 2026-11-18 09:56:29,316] Trial 3 finished with value: 0.883769495912169 and parameters: {'n_estimators': 400, 'learning_rate': 0.01518747922672247, 'num_leaves': 34, 'min_child_samples': 34, 'subsample': 0.728034992108518, 'colsample_bytree': 0.8925879806965068, 'reg_lambda': 0.006290644294586149, 'reg_alpha': 0.11400863701127326, 'is_unbalance': True}. Best is trial 1 with value: 0.9086694406907364.
+trial  3 COMPLETE value=0.883769495912169 best=0.9087
+[I 2026-11-18 09:56:55,880] Trial 4 finished with value: 0.8814127482900433 and parameters: {'n_estimators': 400, 'learning_rate': 0.016666983286066417, 'num_leaves': 17, 'min_child_samples': 252, 'subsample': 0.9828160165372797, 'colsample_bytree': 0.9041986740582306, 'reg_lambda': 0.01653693718282442, 'reg_alpha': 0.002458603276328005, 'is_unbalance': True}. Best is trial 1 with value: 0.9086694406907364.
+trial  4 COMPLETE value=0.8814127482900433 best=0.9087
+[I 2026-11-18 09:56:59,185] Trial 5 pruned. 
+trial  5 PRUNED   value=0.8841419221735205 best=0.9087
+[I 2026-11-18 09:58:11,502] Trial 6 finished with value: 0.9084038681630896 and parameters: {'n_estimators': 600, 'learning_rate': 0.10196967939171485, 'num_leaves': 215, 'min_child_samples': 209, 'subsample': 0.7989499894055425, 'colsample_bytree': 0.9609371175115584, 'reg_lambda': 0.002259279742015696, 'reg_alpha': 0.006080390190296602, 'is_unbalance': False}. Best is trial 1 with value: 0.9086694406907364.
+trial  6 COMPLETE value=0.9084038681630896 best=0.9087
+[I 2026-11-18 09:58:49,911] Trial 7 finished with value: 0.9128645709157152 and parameters: {'n_estimators': 300, 'learning_rate': 0.022544116997360492, 'num_leaves': 156, 'min_child_samples': 33, 'subsample': 0.6404672548436904, 'colsample_bytree': 0.7713480415791243, 'reg_lambda': 0.0036618192203924276, 'reg_alpha': 1.6172900811143154, 'is_unbalance': False}. Best is trial 7 with value: 0.9128645709157152.
+trial  7 COMPLETE value=0.9128645709157152 best=0.9129
+[I 2026-11-18 09:59:00,466] Trial 8 pruned. 
+trial  8 PRUNED   value=0.884662157121213 best=0.9129
+[I 2026-11-18 09:59:18,414] Trial 9 pruned. 
+trial  9 PRUNED   value=0.8931014807099481 best=0.9129
+[I 2026-11-18 09:59:47,441] Trial 10 finished with value: 0.9120644210114617 and parameters: {'n_estimators': 250, 'learning_rate': 0.05715032882283717, 'num_leaves': 128, 'min_child_samples': 16, 'subsample': 0.7278169219946662, 'colsample_bytree': 0.6938282099724772, 'reg_lambda': 0.25758305228525646, 'reg_alpha': 3.6300405938338995, 'is_unbalance': False}. Best is trial 7 with value: 0.9128645709157152.
+trial 10 COMPLETE value=0.9120644210114617 best=0.9129
+[I 2026-11-18 10:00:04,329] Trial 11 finished with value: 0.9125876737661467 and parameters: {'n_estimators': 150, 'learning_rate': 0.03864977299687325, 'num_leaves': 98, 'min_child_samples': 47, 'subsample': 0.6017552744508118, 'colsample_bytree': 0.8054673816016417, 'reg_lambda': 0.01079993592565962, 'reg_alpha': 1.907186340717845, 'is_unbalance': False}. Best is trial 7 with value: 0.9128645709157152.
+trial 11 COMPLETE value=0.9125876737661467 best=0.9129
+[I 2026-11-18 10:00:28,929] Trial 12 finished with value: 0.9126008700454816 and parameters: {'n_estimators': 250, 'learning_rate': 0.02006315377262486, 'num_leaves': 95, 'min_child_samples': 26, 'subsample': 0.6366451591385902, 'colsample_bytree': 0.7251040636543401, 'reg_lambda': 0.0022988354204220266, 'reg_alpha': 0.10890310875444023, 'is_unbalance': False}. Best is trial 7 with value: 0.9128645709157152.
+trial 12 COMPLETE value=0.9126008700454816 best=0.9129
+[I 2026-11-18 10:00:54,579] Trial 13 finished with value: 0.9122993636886066 and parameters: {'n_estimators': 250, 'learning_rate': 0.02440100507464239, 'num_leaves': 55, 'min_child_samples': 39, 'subsample': 0.7300822175350661, 'colsample_bytree': 0.7544809874904369, 'reg_lambda': 0.0027883786141601192, 'reg_alpha': 0.023619899262518833, 'is_unbalance': False}. Best is trial 7 with value: 0.9128645709157152.
+trial 13 COMPLETE value=0.9122993636886066 best=0.9129
+[I 2026-11-18 10:01:18,049] Trial 14 finished with value: 0.9095967392342373 and parameters: {'n_estimators': 200, 'learning_rate': 0.01061077887431135, 'num_leaves': 237, 'min_child_samples': 10, 'subsample': 0.6951666976730242, 'colsample_bytree': 0.7607177691083904, 'reg_lambda': 0.0034805206883137887, 'reg_alpha': 4.905390944149867, 'is_unbalance': False}. Best is trial 7 with value: 0.9128645709157152.
+trial 14 COMPLETE value=0.9095967392342373 best=0.9129
+[I 2026-11-18 10:01:56,046] Trial 15 finished with value: 0.9126208455749006 and parameters: {'n_estimators': 350, 'learning_rate': 0.023639280755773557, 'num_leaves': 101, 'min_child_samples': 32, 'subsample': 0.5581012489511772, 'colsample_bytree': 0.7077345178649216, 'reg_lambda': 0.01763804637657614, 'reg_alpha': 1.5111684140577302, 'is_unbalance': False}. Best is trial 7 with value: 0.9128645709157152.
+trial 15 COMPLETE value=0.9126208455749006 best=0.9129
+[I 2026-11-18 10:02:39,481] Trial 16 finished with value: 0.9127141338344943 and parameters: {'n_estimators': 400, 'learning_rate': 0.020798022185874693, 'num_leaves': 134, 'min_child_samples': 70, 'subsample': 0.5463538623917906, 'colsample_bytree': 0.6780173789637706, 'reg_lambda': 0.026527805616992094, 'reg_alpha': 1.0879080229555318, 'is_unbalance': False}. Best is trial 7 with value: 0.9128645709157152.
+trial 16 COMPLETE value=0.9127141338344943 best=0.9129
+[I 2026-11-18 10:03:36,367] Trial 17 finished with value: 0.9123146141330872 and parameters: {'n_estimators': 500, 'learning_rate': 0.02380786137425921, 'num_leaves': 143, 'min_child_samples': 85, 'subsample': 0.575604908570171, 'colsample_bytree': 0.664609545845776, 'reg_lambda': 0.15195475309657872, 'reg_alpha': 2.028795828805235, 'is_unbalance': False}. Best is trial 7 with value: 0.9128645709157152.
+trial 17 COMPLETE value=0.9123146141330872 best=0.9129
+[I 2026-11-18 10:04:12,332] Trial 18 finished with value: 0.9124941364674916 and parameters: {'n_estimators': 400, 'learning_rate': 0.011942992831305323, 'num_leaves': 96, 'min_child_samples': 40, 'subsample': 0.6720258306208123, 'colsample_bytree': 0.7738059940307618, 'reg_lambda': 0.01453565593332387, 'reg_alpha': 0.9659307549487124, 'is_unbalance': False}. Best is trial 7 with value: 0.9128645709157152.
+trial 18 COMPLETE value=0.9124941364674916 best=0.9129
+[I 2026-11-18 10:04:23,507] Trial 19 pruned. 
+trial 19 PRUNED   value=0.9132304338310266 best=0.9129
+[I 2026-11-18 10:05:22,797] Trial 20 finished with value: 0.9130422864119611 and parameters: {'n_estimators': 450, 'learning_rate': 0.014141481809095736, 'num_leaves': 237, 'min_child_samples': 32, 'subsample': 0.7157500888266711, 'colsample_bytree': 0.7387738637541865, 'reg_lambda': 0.003946992942746613, 'reg_alpha': 1.7050396561701195, 'is_unbalance': False}. Best is trial 20 with value: 0.9130422864119611.
+trial 20 COMPLETE value=0.9130422864119611 best=0.9130
+[I 2026-11-18 10:05:35,826] Trial 21 pruned. 
+trial 21 PRUNED   value=0.9134289367459015 best=0.9130
+[I 2026-11-18 10:06:09,273] Trial 22 finished with value: 0.9127475136786106 and parameters: {'n_estimators': 350, 'learning_rate': 0.020536002105939876, 'num_leaves': 123, 'min_child_samples': 23, 'subsample': 0.5904595812291298, 'colsample_bytree': 0.8624605844433658, 'reg_lambda': 0.0021237502612862355, 'reg_alpha': 2.490349216478995, 'is_unbalance': False}. Best is trial 20 with value: 0.9130422864119611.
+trial 22 COMPLETE value=0.9127475136786106 best=0.9130
+[I 2026-11-18 10:06:41,446] Trial 23 finished with value: 0.9128258370984649 and parameters: {'n_estimators': 300, 'learning_rate': 0.013884808335830416, 'num_leaves': 187, 'min_child_samples': 21, 'subsample': 0.5482278955167662, 'colsample_bytree': 0.8175896062803814, 'reg_lambda': 0.007357336223994103, 'reg_alpha': 0.8919990826571639, 'is_unbalance': False}. Best is trial 20 with value: 0.9130422864119611.
+trial 23 COMPLETE value=0.9128258370984649 best=0.9130
+[I 2026-11-18 10:07:17,132] Trial 24 finished with value: 0.912904787804834 and parameters: {'n_estimators': 300, 'learning_rate': 0.017939971082549376, 'num_leaves': 209, 'min_child_samples': 33, 'subsample': 0.5581974336714441, 'colsample_bytree': 0.8513868250275606, 'reg_lambda': 0.048522603234092646, 'reg_alpha': 0.38024222201017394, 'is_unbalance': False}. Best is trial 20 with value: 0.9130422864119611.
+trial 24 COMPLETE value=0.912904787804834 best=0.9130
+[I 2026-11-18 10:07:36,158] Trial 25 pruned. 
+trial 25 PRUNED   value=0.9140456206736605 best=0.9130
+[I 2026-11-18 10:08:20,096] Trial 26 finished with value: 0.9128728963649468 and parameters: {'n_estimators': 450, 'learning_rate': 0.014256993362525538, 'num_leaves': 121, 'min_child_samples': 30, 'subsample': 0.5528995498803139, 'colsample_bytree': 0.7998201277523888, 'reg_lambda': 0.07741493756870453, 'reg_alpha': 0.1843900402502616, 'is_unbalance': False}. Best is trial 20 with value: 0.9130422864119611.
+trial 26 COMPLETE value=0.9128728963649468 best=0.9130
+[I 2026-11-18 10:08:38,831] Trial 27 pruned. 
+trial 27 PRUNED   value=0.9140526375648372 best=0.9130
+[I 2026-11-18 10:09:13,063] Trial 28 finished with value: 0.9122042144635043 and parameters: {'n_estimators': 300, 'learning_rate': 0.012217258581311112, 'num_leaves': 237, 'min_child_samples': 39, 'subsample': 0.620877215199285, 'colsample_bytree': 0.7421697499905849, 'reg_lambda': 0.002550174380764322, 'reg_alpha': 2.869049359135904, 'is_unbalance': False}. Best is trial 20 with value: 0.9130422864119611.
+trial 28 COMPLETE value=0.9122042144635043 best=0.9130
+[I 2026-11-18 10:10:17,574] Trial 29 finished with value: 0.9128967462717107 and parameters: {'n_estimators': 500, 'learning_rate': 0.01452393304731149, 'num_leaves': 221, 'min_child_samples': 34, 'subsample': 0.5492976592481181, 'colsample_bytree': 0.7358513437275526, 'reg_lambda': 0.001052222064289958, 'reg_alpha': 2.746112380607387, 'is_unbalance': False}. Best is trial 20 with value: 0.9130422864119611.
+trial 29 COMPLETE value=0.9128967462717107 best=0.9130
+== lgbm_tuned (Boosting (Bayesian-tuned))
+  [lgbm_tuned] fold 0: macro F1=0.8970
+  [lgbm_tuned] fold 1: macro F1=0.8990
+  [lgbm_tuned] fold 2: macro F1=0.9255
+  [lgbm_tuned] fold 3: macro F1=0.9418
+  [lgbm_tuned] fold 4: macro F1=0.9028
+  -> test top1=0.8637 macroF1=0.9185 logloss=0.0918
+                    untuned    tuned  change
+cv_macro_f1_mean     0.8887   0.9132  0.0245
+test_top1_accuracy   0.8604   0.8637  0.0033
+test_macro_f1        0.8897   0.9185  0.0287
+test_log_loss        0.1419   0.0918 -0.0501
+train_time_s        10.8399  18.3405  7.5006
+inference_time_s     0.6107   1.6282  1.0175
+best params: {'n_estimators': 450, 'learning_rate': 0.014141481809095736, 'num_leaves': 237, 'min_child_samples': 32, 'subsample': 0.7157500888266711, 'colsample_bytree': 0.7387738637541865, 'reg_lambda': 0.003946992942746613, 'reg_alpha': 1.7050396561701195, 'is_unbalance': False}

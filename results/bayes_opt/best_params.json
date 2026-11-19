@@ -1,0 +1,32 @@
+{
+  "best_params": {
+    "n_estimators": 450,
+    "learning_rate": 0.014141481809095736,
+    "num_leaves": 237,
+    "min_child_samples": 32,
+    "subsample": 0.7157500888266711,
+    "colsample_bytree": 0.7387738637541865,
+    "reg_lambda": 0.003946992942746613,
+    "reg_alpha": 1.7050396561701195,
+    "is_unbalance": false
+  },
+  "best_cv3_macro_f1": 0.9130422864119611,
+  "n_trials": 30,
+  "n_complete": 23,
+  "n_pruned": 7,
+  "search_time_s": 923.8810408115387,
+  "objective": "mean macro F1, 3-fold GroupKFold by trip",
+  "sampler": "TPE (seed 42)",
+  "pruner": "MedianPruner",
+  "search_space": {
+    "n_estimators": "int 100..600",
+    "learning_rate": "log-uniform 0.01..0.2",
+    "num_leaves": "int log 15..255",
+    "min_child_samples": "int log 10..300",
+    "subsample": "uniform 0.5..1.0",
+    "colsample_bytree": "uniform 0.5..1.0",
+    "reg_lambda": "log-uniform 1e-3..10",
+    "reg_alpha": "log-uniform 1e-3..10",
+    "is_unbalance": "categorical {True, False}"
+  }
+}

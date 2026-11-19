@@ -36,7 +36,7 @@
   "test_macro_f1": 0.8974371518550934,
   "test_precision": 0.7363919129082426,
   "test_recall": 0.9424366226691808,
-  "test_log_loss": 0.13950070532368586,
+  "test_log_loss": 0.13950070532368583,
   "test_top1_accuracy": 0.8549060542797495,
   "test_confusion_matrix": [
     [
@@ -48,6 +48,6 @@
       17993
     ]
   ],
-  "train_time_s": 26.794159412384033,
-  "inference_time_s": 0.25133514404296875
+  "train_time_s": 28.50546169281006,
+  "inference_time_s": 0.20408248901367188
 }
