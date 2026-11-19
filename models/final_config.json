@@ -48,5 +48,6 @@
     "00000045"
   ],
   "decoder_tuning_classifier_only_accuracy": 0.8762968874700718,
-  "booster_file": "lgbm_tuned.txt"
+  "booster_file": "lgbm_tuned.txt",
+  "trees_file": "lgbm_tuned_trees.npz"
 }

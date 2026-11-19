@@ -159,5 +159,8 @@ if __name__ == "__main__":
     if FINAL_MODEL.startswith("lgbm"):  # version-independent copy of the final model for the API
         joblib.load(MOD / f"{FINAL_MODEL}.joblib").booster_.save_model(str(MOD / f"{FINAL_MODEL}.txt"))
         cfg["booster_file"] = f"{FINAL_MODEL}.txt"
+        from tree_predictor import export
+        export(MOD / f"{FINAL_MODEL}.txt", MOD / f"{FINAL_MODEL}_trees.npz")
+        cfg["trees_file"] = f"{FINAL_MODEL}_trees.npz"
     json.dump(cfg, open(MOD / "final_config.json", "w"), indent=2)
     print("wrote models/final_config.json")

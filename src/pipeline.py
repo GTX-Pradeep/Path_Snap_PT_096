@@ -23,11 +23,13 @@ class PathSnapPredictor:
     def __init__(self, config_path=MODELS / "final_config.json"):
         self.cfg = json.load(open(config_path))
         self.features = self.cfg["features"]
-        if self.cfg.get("booster_file"):
-            # LightGBM's own text format: loads with any scikit-learn version / Python 3.10+
+        if self.cfg.get("trees_file"):
+            # portable numpy evaluation of the exported LightGBM trees (binary .npz): works on any OS,
+            # Python 3.10+, any scikit-learn/LightGBM version; identical probabilities to LightGBM
+            from tree_predictor import TreeEnsemble
+            self.predict_proba = TreeEnsemble(MODELS / self.cfg["trees_file"]).predict_proba
+        elif self.cfg.get("booster_file"):
             import lightgbm as lgb
-            # read as text and normalise line endings: Git on Windows may convert LF -> CRLF,
-            # which LightGBM's parser rejects ("Model format error, expect a tree here")
             text = (MODELS / self.cfg["booster_file"]).read_bytes().decode("utf-8").replace("\r\n", "\n")
             booster = lgb.Booster(model_str=text)
             self.predict_proba = lambda X: booster.predict(X)
